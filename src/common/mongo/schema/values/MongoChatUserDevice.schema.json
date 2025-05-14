@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/oresoftware/chat.webtrc/src/common/mongo/mongo-chat-user-device",
+  "$ref": "#/$defs/MongoChatUserDevice",
+  "$defs": {
+    "MongoChatUserDevice": {
+      "properties": {
+        "_id": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "UserId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "DeviceId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "DeviceType": {
+          "type": "string"
+        },
+        "DevicePlatform": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "_id",
+        "UserId",
+        "DeviceId",
+        "DeviceType",
+        "DevicePlatform"
+      ]
+    },
+    "ObjectID": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array",
+      "maxItems": 12,
+      "minItems": 12
+    }
+  }
+}

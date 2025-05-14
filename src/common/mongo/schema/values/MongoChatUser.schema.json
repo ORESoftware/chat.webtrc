@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/oresoftware/chat.webtrc/src/common/mongo/mongo-chat-user",
+  "$ref": "#/$defs/MongoChatUser",
+  "$defs": {
+    "MongoChatUser": {
+      "properties": {
+        "_id": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "Handle": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "FirstName": {
+          "type": "string"
+        },
+        "LastName": {
+          "type": "string"
+        },
+        "Email": {
+          "type": "string"
+        },
+        "BirthMonth": {
+          "type": "integer"
+        },
+        "BirthDay": {
+          "type": "integer"
+        },
+        "BirthYear": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "_id",
+        "Handle",
+        "FirstName",
+        "LastName",
+        "Email",
+        "BirthMonth",
+        "BirthDay",
+        "BirthYear"
+      ]
+    },
+    "ObjectID": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array",
+      "maxItems": 12,
+      "minItems": 12
+    }
+  }
+}

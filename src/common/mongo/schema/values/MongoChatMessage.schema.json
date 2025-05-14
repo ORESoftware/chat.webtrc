@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/oresoftware/chat.webtrc/src/common/mongo/mongo-chat-message",
+  "$ref": "#/$defs/MongoChatMessage",
+  "$defs": {
+    "MongoChatMessage": {
+      "properties": {
+        "_id": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "CreatedByUserId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "ChatId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "PriorityUserIds": {
+          "items": {
+            "$ref": "#/$defs/ObjectID"
+          },
+          "type": "array"
+        },
+        "IsGroupChat": {
+          "type": "boolean"
+        },
+        "UserCount": {
+          "type": "integer"
+        },
+        "Messages": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "ReplayCount": {
+          "type": "integer"
+        },
+        "IsReaction": {
+          "type": "boolean"
+        },
+        "IsDeleted": {
+          "type": "boolean"
+        },
+        "DisplayFormat": {
+          "type": "string"
+        },
+        "DateCreatedOnDevice": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "DateFirstOnServer": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "ChildId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "ChildType": {
+          "type": "string"
+        },
+        "ParentId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "ParentType": {
+          "type": "string"
+        },
+        "GrandParentId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "Files": {
+          "items": {
+            "$ref": "#/$defs/VibeMessageFile"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "_id",
+        "CreatedByUserId",
+        "ChatId",
+        "PriorityUserIds",
+        "IsGroupChat",
+        "UserCount",
+        "Messages",
+        "ReplayCount",
+        "IsReaction",
+        "IsDeleted",
+        "DisplayFormat",
+        "DateCreatedOnDevice",
+        "DateFirstOnServer"
+      ]
+    },
+    "ObjectID": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array",
+      "maxItems": 12,
+      "minItems": 12
+    },
+    "VibeMessageFile": {
+      "properties": {
+        "_id": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "Name": {
+          "type": "string"
+        },
+        "Message": {
+          "type": "string"
+        },
+        "Url": {
+          "type": "string"
+        },
+        "Type": {
+          "type": "string"
+        },
+        "Order": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "_id",
+        "Name",
+        "Message",
+        "Url",
+        "Type",
+        "Order"
+      ]
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/oresoftware/chat.webtrc/src/common/mongo/mongo-message-ack",
+  "$ref": "#/$defs/MongoMessageAck",
+  "$defs": {
+    "MongoMessageAck": {
+      "properties": {
+        "_id": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "MessageId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "ChatId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "UserId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "IsRead": {
+          "type": "boolean"
+        },
+        "IsSaved": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "_id",
+        "MessageId",
+        "ChatId",
+        "UserId",
+        "IsRead",
+        "IsSaved"
+      ]
+    },
+    "ObjectID": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array",
+      "maxItems": 12,
+      "minItems": 12
+    }
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/oresoftware/chat.webtrc/src/common/mongo/mongo-chat-map-to-user",
+  "$ref": "#/$defs/MongoChatMapToUser",
+  "$defs": {
+    "MongoChatMapToUser": {
+      "properties": {
+        "_id": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "ChatId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "UserId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "InviterId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "DateAdded": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "DateRemoved": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "IsRemoved": {
+          "type": "boolean"
+        },
+        "IsAdmin": {
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "_id",
+        "ChatId",
+        "UserId",
+        "InviterId",
+        "DateAdded",
+        "DateRemoved",
+        "IsRemoved",
+        "IsAdmin"
+      ]
+    },
+    "ObjectID": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array",
+      "maxItems": 12,
+      "minItems": 12
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/oresoftware/chat.webtrc/src/common/mongo/mongo-chat-conv",
+  "$ref": "#/$defs/MongoChatConv",
+  "$defs": {
+    "MongoChatConv": {
+      "properties": {
+        "_id": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "CreatedByUserId": {
+          "$ref": "#/$defs/ObjectID"
+        },
+        "SeqNum": {
+          "type": "integer"
+        },
+        "ChatTitle": {
+          "type": "string"
+        },
+        "MessageCount": {
+          "type": "integer"
+        },
+        "PrivateKey": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object",
+      "required": [
+        "_id",
+        "CreatedByUserId",
+        "SeqNum",
+        "ChatTitle",
+        "MessageCount",
+        "PrivateKey"
+      ]
+    },
+    "ObjectID": {
+      "items": {
+        "type": "integer"
+      },
+      "type": "array",
+      "maxItems": 12,
+      "minItems": 12
+    }
+  }
+}
