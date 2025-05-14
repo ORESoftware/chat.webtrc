@@ -2,7 +2,7 @@
 package rabbitmq
 
 import (
-	"github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	"github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"net"
 	"sync"

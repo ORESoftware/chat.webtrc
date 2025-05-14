@@ -2,8 +2,8 @@
 package virl_err
 
 import (
-	vapm "github.com/oresoftware/chat.webtrc/src/common/apm"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	vapm "github.com/oresoftware/chat.webrtc/src/common/apm"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
 )
 
 type ErrorWithCode struct {

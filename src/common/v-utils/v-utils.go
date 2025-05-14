@@ -8,7 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/google/uuid"
-	"github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	"github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"net/http"
 	"net/url"

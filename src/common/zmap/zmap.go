@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
-	vbu "github.com/oresoftware/chat.webtrc/src/common/v-utils"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	vbu "github.com/oresoftware/chat.webrtc/src/common/v-utils"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 )

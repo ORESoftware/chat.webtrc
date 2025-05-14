@@ -3,7 +3,7 @@ package virl_mongo
 
 import (
 	"context"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"

@@ -19,18 +19,18 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	vapm "github.com/oresoftware/chat.webtrc/src/common/apm"
-	"github.com/oresoftware/chat.webtrc/src/common/gor"
-	vhp "github.com/oresoftware/chat.webtrc/src/common/handle-panic"
-	vjwt "github.com/oresoftware/chat.webtrc/src/common/jwt" // Still needed for auth check logic
-	virl_mongo "github.com/oresoftware/chat.webtrc/src/common/mongo"
-	mngo_types "github.com/oresoftware/chat.webtrc/src/common/mongo/types" // Still needed for Mongo types
-	vctx "github.com/oresoftware/chat.webtrc/src/common/mongo/vctx" // Still needed for Mongo context
-	vbu "github.com/oresoftware/chat.webtrc/src/common/v-utils" // Still needed for utils
-	virl_err "github.com/oresoftware/chat.webtrc/src/common/verrors" // Still needed for errors
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog" // Still needed
-	virl_conf "github.com/oresoftware/chat.webtrc/src/config" // Still needed
-	vuc "github.com/oresoftware/chat.webtrc/src/ws/uc" // Still needed
+	vapm "github.com/oresoftware/chat.webrtc/src/common/apm"
+	"github.com/oresoftware/chat.webrtc/src/common/gor"
+	vhp "github.com/oresoftware/chat.webrtc/src/common/handle-panic"
+	vjwt "github.com/oresoftware/chat.webrtc/src/common/jwt" // Still needed for auth check logic
+	virl_mongo "github.com/oresoftware/chat.webrtc/src/common/mongo"
+	mngo_types "github.com/oresoftware/chat.webrtc/src/common/mongo/types" // Still needed for Mongo types
+	vctx "github.com/oresoftware/chat.webrtc/src/common/mongo/vctx" // Still needed for Mongo context
+	vbu "github.com/oresoftware/chat.webrtc/src/common/v-utils" // Still needed for utils
+	virl_err "github.com/oresoftware/chat.webrtc/src/common/verrors" // Still needed for errors
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog" // Still needed
+	virl_conf "github.com/oresoftware/chat.webrtc/src/config" // Still needed
+	vuc "github.com/oresoftware/chat.webrtc/src/ws/uc" // Still needed
 
 	"github.com/gorilla/websocket" // Still needed for websockets
 	"github.com/mailru/easyjson" // Still needed for easyjson unmarshalling
@@ -1102,6 +1102,7 @@ func (s *Service) handleIncomingWSMessages(uc *vuc.UserCtx, z gor.Updater) {
 					// The current approach acknowledges the sender once the message is saved to the DB.
 
 				})
+				
 				continue // Process next item in the List
 
 

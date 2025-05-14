@@ -4,7 +4,7 @@ package vjwt
 import (
 	"fmt"
 	"github.com/golang-jwt/jwt"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"os"
 	"time"
 )

@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/invopop/jsonschema"
-	mngo_types "github.com/oresoftware/chat.webtrc/src/common/mongo/types"
-	vbu "github.com/oresoftware/chat.webtrc/src/common/v-utils"
+	mngo_types "github.com/oresoftware/chat.webrtc/src/common/mongo/types"
+	vbu "github.com/oresoftware/chat.webrtc/src/common/v-utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"os"
 )

@@ -3,8 +3,8 @@ package gor
 
 import (
 	"fmt"
-	vhp "github.com/oresoftware/chat.webtrc/src/common/handle-panic"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	vhp "github.com/oresoftware/chat.webrtc/src/common/handle-panic"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"runtime"
 	"sync"
 	"time"

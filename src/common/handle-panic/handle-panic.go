@@ -2,10 +2,10 @@
 package vhp
 
 import (
-	vapm "github.com/oresoftware/chat.webtrc/src/common/apm"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
-	"github.com/oresoftware/chat.webtrc/src/rest/user"
-	vuc "github.com/oresoftware/chat.webtrc/src/ws/uc"
+	vapm "github.com/oresoftware/chat.webrtc/src/common/apm"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
+	"github.com/oresoftware/chat.webrtc/src/rest/user"
+	vuc "github.com/oresoftware/chat.webrtc/src/ws/uc"
 )
 
 func HandlePanic(id string) interface{} {

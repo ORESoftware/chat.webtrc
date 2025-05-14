@@ -2,7 +2,7 @@
 package virl_mongo
 
 import (
-	vutils "github.com/oresoftware/chat.webtrc/src/common/v-utils"
+	vutils "github.com/oresoftware/chat.webrtc/src/common/v-utils"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

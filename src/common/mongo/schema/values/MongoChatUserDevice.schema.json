@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://github.com/oresoftware/chat.webtrc/src/common/mongo/mongo-chat-user-device",
+  "$id": "https://github.com/oresoftware/chat.webrtc/src/common/mongo/mongo-chat-user-device",
   "$ref": "#/$defs/MongoChatUserDevice",
   "$defs": {
     "MongoChatUserDevice": {

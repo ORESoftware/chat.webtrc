@@ -4,7 +4,7 @@ package virl_redis
 import (
 	"context"
 	"github.com/go-redis/redis/v8"
-	"github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	"github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"net"
 	"sync"
 	"time"

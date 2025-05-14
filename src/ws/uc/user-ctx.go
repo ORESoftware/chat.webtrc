@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/oresoftware/chat.webrtc/src/common/vibelog" // Assuming this is needed for logging
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"sync"
 	"time"
-
-	"github.com/oresoftware/chat.webtrc/src/common/vibelog" // Assuming this is needed for logging
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 	"github.com/gorilla/websocket"
 	"github.com/pion/webrtc/v3" // Add Pion import
@@ -71,7 +71,7 @@ func (uc *UserCtx) WriteMessageSafely(messageType int, data []byte) error {
 	if err := uc.WSConn.WriteMessage(messageType, data); err != nil {
 		// Log the error, SafeClose will handle cleanup if needed
 		// uc.Log.Warn(vbl.Id("vid/9d157baaa874"), err) // Removed uc.Log
-		vibelog.Stdout.Warn(vibelog.Id("vid/9d157baaa874"), fmt.Sprintf("Error writing WS message: %v", err))
+		vbl.Stdout.Warn(vbl.Id("vid/9d157baaa874"), fmt.Sprintf("Error writing WS message: %v", err))
 		return err
 	}
 
@@ -86,12 +86,12 @@ func (uc *UserCtx) SafeClose(ignoreError bool) error {
 
 	// Ensure this block runs only once
 	uc.CloseOnce.Do(func() {
-		vibelog.Stdout.Info(vibelog.Id("vid/uc_safe_close"), fmt.Sprintf("Closing connection for user %s, device %s", uc.UserId, uc.DeviceId))
+		vbl.Stdout.Info(vbl.Id("vid/uc_safe_close"), fmt.Sprintf("Closing connection for user %s, device %s", uc.UserId, uc.DeviceId))
 
 		conn := uc.WSConn // Get a local ref to obj
 
 		if conn == nil {
-			vibelog.Stdout.Error(vibelog.Id("vid/12cd8a4741d1"), "missing conn (nil) during SafeClose")
+			vbl.Stdout.Error(vbl.Id("vid/12cd8a4741d1"), "missing conn (nil) during SafeClose")
 			// Already closed or never initialized properly
 			uc.IsConnClosed = true // Ensure the flag is set
 			uc.FireOnDisconnect()  // Fire callbacks even if conn was nil
@@ -101,9 +101,9 @@ func (uc *UserCtx) SafeClose(ignoreError bool) error {
 		// Close WebRTC PeerConnections first
 		uc.webrtcPCsMtx.Lock()
 		for callID, pc := range uc.webrtcPCs {
-			vibelog.Stdout.Info(vibelog.Id("vid/webrtc_pc_close"), fmt.Sprintf("Closing WebRTC PeerConnection for call %s (user %s)", callID, uc.UserId))
+			vbl.Stdout.Info(vbl.Id("vid/webrtc_pc_close"), fmt.Sprintf("Closing WebRTC PeerConnection for call %s (user %s)", callID, uc.UserId))
 			if closeErr := pc.Close(); closeErr != nil && !errors.Is(closeErr, webrtc.ErrConnectionClosed) {
-				vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_pc_close_err"), fmt.Sprintf("Error closing WebRTC PC for call %s (user %s): %v", callID, closeErr))
+				vbl.Stdout.Warn(vbl.Id("vid/webrtc_pc_close_err"), fmt.Sprintf("Error closing WebRTC PC for call %s (user %s): %v", callID, closeErr))
 			}
 			delete(uc.webrtcPCs, callID) // Remove from map immediately
 		}
@@ -113,18 +113,18 @@ func (uc *UserCtx) SafeClose(ignoreError bool) error {
 		closeMessage := websocket.FormatCloseMessage(websocket.CloseNormalClosure, "")
 		if err := conn.WriteMessage(websocket.CloseMessage, closeMessage); err != nil {
 			if ignoreError {
-				vibelog.Stdout.Debug(vibelog.Id("vid/167a70968cb7"), fmt.Sprintf("Error writing WS close message (ignored): %v", err))
+				vbl.Stdout.Debug(vbl.Id("vid/167a70968cb7"), fmt.Sprintf("Error writing WS close message (ignored): %v", err))
 			} else {
-				vibelog.Stdout.Warn(vibelog.Id("vid/75d565e715b5"), fmt.Sprintf("Error writing WS close message: %v", err))
+				vbl.Stdout.Warn(vbl.Id("vid/75d565e715b5"), fmt.Sprintf("Error writing WS close message: %v", err))
 			}
 		}
 
 		// Close the underlying WebSocket connection
 		if err := conn.Close(); err != nil {
 			if ignoreError {
-				vibelog.Stdout.Debug(vibelog.Id("vid/dd3ddc35e286"), fmt.Sprintf("Error closing WS connection (ignored): %v", err))
+				vbl.Stdout.Debug(vbl.Id("vid/dd3ddc35e286"), fmt.Sprintf("Error closing WS connection (ignored): %v", err))
 			} else {
-				vibelog.Stdout.Warn(vibelog.Id("vid/379183697c57"), fmt.Sprintf("Error closing WS connection: %v", err))
+				vbl.Stdout.Warn(vbl.Id("vid/379183697c57"), fmt.Sprintf("Error closing WS connection: %v", err))
 			}
 		}
 
@@ -171,7 +171,7 @@ func (uc *UserCtx) WriteJSONSafely(callTrace []string, v interface{}) error {
 	var cs []string
 	// Only get stack trace if configured and not in production for performance/verbosity
 	// Assuming config is accessible or passed down. Let's get it directly for now.
-	cfg := vibelog.GetLogConf() // Assuming vibelog config includes this setting
+	cfg := vbl.GetLogConf() // Assuming vibelog config includes this setting
 	if cfg.EnableStackTraces {
 		// Ensure GetNewStacktraceFrom is available or implement stack trace capture
 		// cs = vbu.GetNewStacktraceFrom(callTrace) // Need vbu import, GetNewStacktraceFrom func
@@ -197,13 +197,13 @@ func (uc *UserCtx) WriteJSONSafely(callTrace []string, v interface{}) error {
 	if err != nil {
 		// This is an error marshalling the *outgoing* message. Log it and return.
 		// Do not attempt to write to the WS conn as the data is invalid.
-		vibelog.Stdout.Error(vibelog.Id("vid/ws_write_json_marshal_err"), fmt.Sprintf("Failed to marshal outgoing WS message: %v, data: %+v", err, v))
+		vbl.Stdout.Error(vbl.Id("vid/ws_write_json_marshal_err"), fmt.Sprintf("Failed to marshal outgoing WS message: %v, data: %+v", err, v))
 		return err
 	}
 
 	if err := uc.WSConn.WriteMessage(websocket.TextMessage, jsonData); err != nil {
 		// Error writing to the connection (e.g., connection closed)
-		vibelog.Stdout.Warn(vibelog.Id("vid/f1e0fb06755b"), fmt.Sprintf("Error writing JSON to WS connection: %v", err))
+		vbl.Stdout.Warn(vbl.Id("vid/f1e0fb06755b"), fmt.Sprintf("Error writing JSON to WS connection: %v", err))
 		return err
 	}
 
@@ -230,18 +230,18 @@ func (uc *UserCtx) SendWebRTCMessage(callTrace []string, msgType string, payload
 	// so we know which call the message belongs to.
 	payloadMap, ok := payload.(map[string]interface{})
 	if !ok {
-		vibelog.Stdout.Error(vibelog.Id("vid/webrtc_send_invalid_payload"), fmt.Sprintf("Invalid payload type for SendWebRTCMessage (expected map[string]interface{}): %+v", payload))
+		vbl.Stdout.Error(vbl.Id("vid/webrtc_send_invalid_payload"), fmt.Sprintf("Invalid payload type for SendWebRTCMessage (expected map[string]interface{}): %+v", payload))
 		return errors.New("invalid payload type for webrtc signaling")
 	}
 
 	callIdVal, ok := payloadMap["callId"]
 	if !ok {
-		vibelog.Stdout.Error(vibelog.Id("vid/webrtc_send_missing_callid"), fmt.Sprintf("Payload for SendWebRTCMessage missing 'callId': %+v", payload))
+		vbl.Stdout.Error(vbl.Id("vid/webrtc_send_missing_callid"), fmt.Sprintf("Payload for SendWebRTCMessage missing 'callId': %+v", payload))
 		return errors.New("payload missing callId")
 	}
 	callId, ok := callIdVal.(string)
 	if !ok {
-		vibelog.Stdout.Error(vibelog.Id("vid/webrtc_send_invalid_callid"), fmt.Sprintf("Payload 'callId' is not a string: %+v", payload))
+		vbl.Stdout.Error(vbl.Id("vid/webrtc_send_invalid_callid"), fmt.Sprintf("Payload 'callId' is not a string: %+v", payload))
 		return errors.New("payload 'callId' is not a string")
 	}
 
@@ -290,16 +290,16 @@ func (uc *UserCtx) GetOrCreatePeerConnection(callTrace []string, callId string, 
 	defer uc.webrtcPCsMtx.Unlock()
 
 	if pc, ok := uc.webrtcPCs[callId]; ok && pc != nil {
-		vibelog.Stdout.Debug(vibelog.Id("vid/webrtc_pc_exists"), fmt.Sprintf("Reusing existing PeerConnection for call %s (user %s)", callId, uc.UserId))
+		vbl.Stdout.Debug(vbl.Id("vid/webrtc_pc_exists"), fmt.Sprintf("Reusing existing PeerConnection for call %s (user %s)", callId, uc.UserId))
 		return pc, nil
 	}
 
-	vibelog.Stdout.Info(vibelog.Id("vid/webrtc_pc_create"), fmt.Sprintf("Creating new PeerConnection for call %s (user %s)", callId, uc.UserId))
+	vbl.Stdout.Info(vbl.Id("vid/webrtc_pc_create"), fmt.Sprintf("Creating new PeerConnection for call %s (user %s)", callId, uc.UserId))
 
 	// Create a new PeerConnection
 	pc, err := webrtc.NewPeerConnection(webrtcConfig)
 	if err != nil {
-		vibelog.Stdout.Error(vibelog.Id("vid/webrtc_pc_create_err"), fmt.Sprintf("Error creating PeerConnection for call %s (user %s): %v", callId, uc.UserId, err))
+		vbl.Stdout.Error(vbl.Id("vid/webrtc_pc_create_err"), fmt.Sprintf("Error creating PeerConnection for call %s (user %s): %v", callId, uc.UserId, err))
 		return nil, err
 	}
 
@@ -309,16 +309,16 @@ func (uc *UserCtx) GetOrCreatePeerConnection(callTrace []string, callId string, 
 	pc.OnICECandidate(func(candidate *webrtc.ICECandidate) {
 		if candidate == nil {
 			// Candidate gathering finished. Optionally send an "ice-completion" signal.
-			vibelog.Stdout.Debug(vibelog.Id("vid/webrtc_ice_candidate_done"), fmt.Sprintf("ICE candidate gathering finished for call %s (user %s)", callId, uc.UserId))
+			vbl.Stdout.Debug(vbl.Id("vid/webrtc_ice_candidate_done"), fmt.Sprintf("ICE candidate gathering finished for call %s (user %s)", callId, uc.UserId))
 			// Example: Send a signal to the client indicating ICE gathering is complete
 			completionPayload := map[string]interface{}{"callId": callId, "status": "completed"}
 			if sendErr := uc.SendWebRTCMessage(callTrace, "ice_gathering_status", completionPayload); sendErr != nil {
-				vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_send_ice_gathering_status_err"), fmt.Sprintf("Error sending ICE gathering status for call %s (user %s): %v", callId, uc.UserId, sendErr))
+				vbl.Stdout.Warn(vbl.Id("vid/webrtc_send_ice_gathering_status_err"), fmt.Sprintf("Error sending ICE gathering status for call %s (user %s): %v", callId, uc.UserId, sendErr))
 			}
 			return
 		}
 
-		vibelog.Stdout.Debug(vibelog.Id("vid/webrtc_ice_candidate"), fmt.Sprintf("New ICE candidate for call %s (user %s): %v", callId, uc.UserId, candidate.ToJSON()))
+		vbl.Stdout.Debug(vbl.Id("vid/webrtc_ice_candidate"), fmt.Sprintf("New ICE candidate for call %s (user %s): %v", callId, uc.UserId, candidate.ToJSON()))
 
 		// Send the ICE candidate to the other peer via the signaling server (WebSocket)
 		// The peer will receive this via the signaling handler in Service.handleIncomingWSMessages
@@ -331,28 +331,28 @@ func (uc *UserCtx) GetOrCreatePeerConnection(callTrace []string, callId string, 
 			"originatorUserId": uc.UserId, // Add sender info
 		}
 		if sendErr := uc.SendWebRTCMessage(callTrace, "ice", icePayload); sendErr != nil {
-			vibelog.Stdout.Error(vibelog.Id("vid/webrtc_send_ice_err"), fmt.Sprintf("Error sending ICE candidate for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Error(vbl.Id("vid/webrtc_send_ice_err"), fmt.Sprintf("Error sending ICE candidate for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 	})
 
 	// Handle connection state changes
 	pc.OnConnectionStateChange(func(s webrtc.PeerConnectionState) {
-		vibelog.Stdout.Info(vibelog.Id("vid/webrtc_conn_state"), fmt.Sprintf("PeerConnection state for call %s (user %s) changed: %s", callId, uc.UserId, s.String()))
+		vbl.Stdout.Info(vbl.Id("vid/webrtc_conn_state"), fmt.Sprintf("PeerConnection state for call %s (user %s) changed: %s", callId, uc.UserId, s.String()))
 
 		// Notify the client over WS about the state change
 		statusPayload := map[string]interface{}{"callId": callId, "state": s.String()}
 		if sendErr := uc.SendWebRTCMessage(callTrace, "webrtc_connection_status", statusPayload); sendErr != nil {
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_send_conn_status_err"), fmt.Sprintf("Error sending connection status for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_send_conn_status_err"), fmt.Sprintf("Error sending connection status for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 
 		switch s {
 		case webrtc.PeerConnectionStateConnected:
-			vibelog.Stdout.Info(vibelog.Id("vid/webrtc_connected"), fmt.Sprintf("PeerConnection for call %s (user %s) connected!", callId, uc.UserId))
+			vbl.Stdout.Info(vbl.Id("vid/webrtc_connected"), fmt.Sprintf("PeerConnection for call %s (user %s) connected!", callId, uc.UserId))
 		case webrtc.PeerConnectionStateDisconnected:
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_disconnected"), fmt.Sprintf("PeerConnection for call %s (user %s) disconnected!", callId, uc.UserId))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_disconnected"), fmt.Sprintf("PeerConnection for call %s (user %s) disconnected!", callId, uc.UserId))
 			uc.RemovePeerConnection(callId) // Clean up PC on disconnection
 		case webrtc.PeerConnectionStateFailed, webrtc.PeerConnectionStateClosed:
-			vibelog.Stdout.Error(vibelog.Id("vid/webrtc_failed"), fmt.Sprintf("PeerConnection for call %s (user %s) failed or closed!", callId, uc.UserId))
+			vbl.Stdout.Error(vbl.Id("vid/webrtc_failed"), fmt.Sprintf("PeerConnection for call %s (user %s) failed or closed!", callId, uc.UserId))
 			uc.RemovePeerConnection(callId) // Clean up PC on failure/closure
 		default:
 			// Other states like New, Connecting
@@ -361,27 +361,27 @@ func (uc *UserCtx) GetOrCreatePeerConnection(callTrace []string, callId string, 
 
 	// Handle ICE connection state changes
 	pc.OnICEConnectionStateChange(func(s webrtc.ICEConnectionState) {
-		vibelog.Stdout.Debug(vibelog.Id("vid/webrtc_ice_state"), fmt.Sprintf("ICE connection state for call %s (user %s) changed: %s", callId, uc.UserId, s.String()))
+		vbl.Stdout.Debug(vbl.Id("vid/webrtc_ice_state"), fmt.Sprintf("ICE connection state for call %s (user %s) changed: %s", callId, uc.UserId, s.String()))
 		// Optionally notify the client
 		iceStatePayload := map[string]interface{}{"callId": callId, "iceState": s.String()}
 		if sendErr := uc.SendWebRTCMessage(callTrace, "ice_status", iceStatePayload); sendErr != nil {
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_send_ice_status_err"), fmt.Sprintf("Error sending ICE status for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_send_ice_status_err"), fmt.Sprintf("Error sending ICE status for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 	})
 
 	// Handle Signaling state changes
 	pc.OnSignalingStateChange(func(s webrtc.SignalingState) {
-		vibelog.Stdout.Debug(vibelog.Id("vid/webrtc_signaling_state"), fmt.Sprintf("Signaling state for call %s (user %s) changed: %s", callId, uc.UserId, s.String()))
+		vbl.Stdout.Debug(vbl.Id("vid/webrtc_signaling_state"), fmt.Sprintf("Signaling state for call %s (user %s) changed: %s", callId, uc.UserId, s.String()))
 		// Optionally notify the client
 		signalingStatePayload := map[string]interface{}{"callId": callId, "signalingState": s.String()}
 		if sendErr := uc.SendWebRTCMessage(callTrace, "signaling_status", signalingStatePayload); sendErr != nil {
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_send_signaling_status_err"), fmt.Sprintf("Error sending signaling status for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_send_signaling_status_err"), fmt.Sprintf("Error sending signaling status for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 	})
 
 	// Handle DataChannel creation initiated by the remote peer
 	pc.OnDataChannel(func(d *webrtc.DataChannel) {
-		vibelog.Stdout.Info(vibelog.Id("vid/webrtc_data_channel"), fmt.Sprintf("New DataChannel '%s' (ID: %d) for call %s (user %s)", d.Label(), *d.ID(), callId, uc.UserId))
+		vbl.Stdout.Info(vbl.Id("vid/webrtc_data_channel"), fmt.Sprintf("New DataChannel '%s' (ID: %d) for call %s (user %s)", d.Label(), *d.ID(), callId, uc.UserId))
 
 		// Set up DataChannel event handlers
 		setupDataChannelHandlers(d, uc, callId, callTrace) // Use a helper function
@@ -398,10 +398,10 @@ func (uc *UserCtx) GetOrCreatePeerConnection(callTrace []string, callId string, 
 		}
 		dataChannel, err := pc.CreateDataChannel("chat", options) // Data channel label, options
 		if err != nil {
-			vibelog.Stdout.Error(vibelog.Id("vid/webrtc_dc_create_err"), fmt.Sprintf("Error creating DataChannel for call %s (user %s): %v", callId, uc.UserId, err))
+			vbl.Stdout.Error(vbl.Id("vid/webrtc_dc_create_err"), fmt.Sprintf("Error creating DataChannel for call %s (user %s): %v", callId, uc.UserId, err))
 			// Return the PC anyway, but log the error. The client might still want audio/video.
 		} else {
-			vibelog.Stdout.Info(vibelog.Id("vid/webrtc_dc_created"), fmt.Sprintf("Created DataChannel '%s' (ID: %d) for call %s (user %s)", dataChannel.Label(), *dataChannel.ID(), callId, uc.UserId))
+			vbl.Stdout.Info(vbl.Id("vid/webrtc_dc_created"), fmt.Sprintf("Created DataChannel '%s' (ID: %d) for call %s (user %s)", dataChannel.Label(), *dataChannel.ID(), callId, uc.UserId))
 			setupDataChannelHandlers(dataChannel, uc, callId, callTrace) // Setup handlers for the channel we created
 		}
 	}
@@ -418,26 +418,26 @@ func (uc *UserCtx) GetOrCreatePeerConnection(callTrace []string, callId string, 
 // This is called for channels created locally (offerer) and remotely (answerer).
 func setupDataChannelHandlers(d *webrtc.DataChannel, uc *UserCtx, callId string, callTrace []string) {
 	d.OnOpen(func() {
-		vibelog.Stdout.Info(vibelog.Id("vid/webrtc_data_channel_open"), fmt.Sprintf("DataChannel '%s' (ID: %d) for call %s (user %s) is now open.", d.Label(), *d.ID(), callId, uc.UserId))
+		vbl.Stdout.Info(vbl.Id("vid/webrtc_data_channel_open"), fmt.Sprintf("DataChannel '%s' (ID: %d) for call %s (user %s) is now open.", d.Label(), *d.ID(), callId, uc.UserId))
 		// Optionally send a message over this DataChannel to signal readiness or send initial data
 		// Note: Sending binary []byte("...") or text string("...")
 		if sendErr := d.SendText(fmt.Sprintf("Hello from server DataChannel! DC '%s' (ID: %d) for call %s", d.Label(), *d.ID(), callId)); sendErr != nil {
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_dc_send_err"), fmt.Sprintf("Error sending initial DataChannel message for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_dc_send_err"), fmt.Sprintf("Error sending initial DataChannel message for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 		// Optionally notify the client over WS that the DC is open
 		dcStatusPayload := map[string]interface{}{"callId": callId, "dcLabel": d.Label(), "dcID": *d.ID(), "state": "open"}
 		if sendErr := uc.SendWebRTCMessage(callTrace, "datachannel_status", dcStatusPayload); sendErr != nil {
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_send_dc_status_err"), fmt.Sprintf("Error sending DataChannel status for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_send_dc_status_err"), fmt.Sprintf("Error sending DataChannel status for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 	})
 
 	d.OnMessage(func(msg webrtc.DataChannelMessage) {
 		// msg.Data is []byte
 		if msg.IsString {
-			vibelog.Stdout.Info(vibelog.Id("vid/webrtc_data_channel_msg_text"), fmt.Sprintf("DataChannel '%s' (ID: %d) received text message for call %s (user %s): %s", d.Label(), *d.ID(), callId, uc.UserId, string(msg.Data)))
+			vbl.Stdout.Info(vbl.Id("vid/webrtc_data_channel_msg_text"), fmt.Sprintf("DataChannel '%s' (ID: %d) received text message for call %s (user %s): %s", d.Label(), *d.ID(), callId, uc.UserId, string(msg.Data)))
 			// Echo the message back over the DataChannel (example)
 			if echoErr := d.SendText("Server received your text: " + string(msg.Data)); echoErr != nil {
-				vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_dc_echo_err"), fmt.Sprintf("Error echoing text DataChannel message for call %s (user %s): %v", callId, uc.UserId, echoErr))
+				vbl.Stdout.Warn(vbl.Id("vid/webrtc_dc_echo_err"), fmt.Sprintf("Error echoing text DataChannel message for call %s (user %s): %v", callId, uc.UserId, echoErr))
 			}
 			// TODO: Implement logic to relay this message to other participants in the call
 			// This would likely involve finding other UserCtx objects associated with this callId
@@ -469,33 +469,33 @@ func setupDataChannelHandlers(d *webrtc.DataChannel, uc *UserCtx, callId string,
 			}
 			// Send this data message over WS (using the "data" type in signaling)
 			if relayErr := uc.SendWebRTCMessage(callTrace, "data", dataRelayPayload); relayErr != nil {
-				vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_relay_ws_err"), fmt.Sprintf("Error relaying data message over WS for call %s (user %s): %v", callId, uc.UserId, relayErr))
+				vbl.Stdout.Warn(vbl.Id("vid/webrtc_relay_ws_err"), fmt.Sprintf("Error relaying data message over WS for call %s (user %s): %v", callId, uc.UserId, relayErr))
 			}
 
 		} else {
-			vibelog.Stdout.Info(vibelog.Id("vid/webrtc_data_channel_msg_bin"), fmt.Sprintf("DataChannel '%s' (ID: %d) received binary message (%d bytes) for call %s (user %s)", d.Label(), *d.ID(), len(msg.Data), callId, uc.UserId))
+			vbl.Stdout.Info(vbl.Id("vid/webrtc_data_channel_msg_bin"), fmt.Sprintf("DataChannel '%s' (ID: %d) received binary message (%d bytes) for call %s (user %s)", d.Label(), *d.ID(), len(msg.Data), callId, uc.UserId))
 			// Echo the message back over the DataChannel (example)
 			if echoErr := d.Send(msg.Data); echoErr != nil {
-				vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_dc_echo_err_bin"), fmt.Sprintf("Error echoing binary DataChannel message for call %s (user %s): %v", callId, uc.UserId, echoErr))
+				vbl.Stdout.Warn(vbl.Id("vid/webrtc_dc_echo_err_bin"), fmt.Sprintf("Error echoing binary DataChannel message for call %s (user %s): %v", callId, uc.UserId, echoErr))
 			}
 			// TODO: Process or relay binary data
 		}
 	})
 
 	d.OnClose(func() {
-		vibelog.Stdout.Info(vibelog.Id("vid/webrtc_data_channel_close"), fmt.Sprintf("DataChannel '%s' (ID: %d) for call %s (user %s) is now closed.", d.Label(), *d.ID(), callId, uc.UserId))
+		vbl.Stdout.Info(vbl.Id("vid/webrtc_data_channel_close"), fmt.Sprintf("DataChannel '%s' (ID: %d) for call %s (user %s) is now closed.", d.Label(), *d.ID(), callId, uc.UserId))
 		// TODO: Clean up DataChannel reference if stored in UserCtx
 		dcStatusPayload := map[string]interface{}{"callId": callId, "dcLabel": d.Label(), "dcID": *d.ID(), "state": "closed"}
 		if sendErr := uc.SendWebRTCMessage(callTrace, "datachannel_status", dcStatusPayload); sendErr != nil {
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_send_dc_status_err_close"), fmt.Sprintf("Error sending DataChannel status for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_send_dc_status_err_close"), fmt.Sprintf("Error sending DataChannel status for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 	})
 
 	d.OnError(func(err error) {
-		vibelog.Stdout.Error(vibelog.Id("vid/webrtc_data_channel_error"), fmt.Sprintf("DataChannel '%s' (ID: %d) for call %s (user %s) encountered an error: %v", d.Label(), *d.ID(), callId, uc.UserId, err))
+		vbl.Stdout.Error(vbl.Id("vid/webrtc_data_channel_error"), fmt.Sprintf("DataChannel '%s' (ID: %d) for call %s (user %s) encountered an error: %v", d.Label(), *d.ID(), callId, uc.UserId, err))
 		dcStatusPayload := map[string]interface{}{"callId": callId, "dcLabel": d.Label(), "dcID": *d.ID(), "state": "error", "error": err.Error()}
 		if sendErr := uc.SendWebRTCMessage(callTrace, "datachannel_status", dcStatusPayload); sendErr != nil {
-			vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_send_dc_status_err_error"), fmt.Sprintf("Error sending DataChannel status for call %s (user %s): %v", callId, uc.UserId, sendErr))
+			vbl.Stdout.Warn(vbl.Id("vid/webrtc_send_dc_status_err_error"), fmt.Sprintf("Error sending DataChannel status for call %s (user %s): %v", callId, uc.UserId, sendErr))
 		}
 	})
 }
@@ -506,16 +506,16 @@ func (uc *UserCtx) RemovePeerConnection(callId string) {
 	defer uc.webrtcPCsMtx.Unlock()
 
 	if pc, ok := uc.webrtcPCs[callId]; ok && pc != nil {
-		vibelog.Stdout.Info(vibelog.Id("vid/webrtc_pc_remove"), fmt.Sprintf("Removing PeerConnection for call %s (user %s)", callId, uc.UserId))
+		vbl.Stdout.Info(vbl.Id("vid/webrtc_pc_remove"), fmt.Sprintf("Removing PeerConnection for call %s (user %s)", callId, uc.UserId))
 		// Attempt to close the PC if it's not already closed/failed
 		if pc.ConnectionState() != webrtc.PeerConnectionStateClosed && pc.ConnectionState() != webrtc.PeerConnectionStateFailed {
 			if closeErr := pc.Close(); closeErr != nil && !errors.Is(closeErr, webrtc.ErrConnectionClosed) {
-				vibelog.Stdout.Warn(vibelog.Id("vid/webrtc_pc_close_on_remove_err"), fmt.Sprintf("Error closing WebRTC PC on remove for call %s (user %s): %v", callId, uc.UserId, closeErr))
+				vbl.Stdout.Warn(vbl.Id("vid/webrtc_pc_close_on_remove_err"), fmt.Sprintf("Error closing WebRTC PC on remove for call %s (user %s): %v", callId, uc.UserId, closeErr))
 			}
 		}
 		delete(uc.webrtcPCs, callId) // Remove from map
 	} else {
-		vibelog.Stdout.Debug(vibelog.Id("vid/webrtc_pc_remove_not_found"), fmt.Sprintf("PeerConnection for call %s not found for removal (user %s)", callId, uc.UserId))
+		vbl.Stdout.Debug(vbl.Id("vid/webrtc_pc_remove_not_found"), fmt.Sprintf("PeerConnection for call %s not found for removal (user %s)", callId, uc.UserId))
 	}
 }
 

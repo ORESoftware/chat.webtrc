@@ -3,8 +3,8 @@ package virl_mongo
 
 import (
 	"context"
-	virl_cleanup "github.com/oresoftware/chat.webtrc/src/common/cleanup"
-	"github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	virl_cleanup "github.com/oresoftware/chat.webrtc/src/common/cleanup"
+	"github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"sync"

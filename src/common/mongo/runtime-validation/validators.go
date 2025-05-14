@@ -2,9 +2,9 @@
 package runtime_validation
 
 import (
-	mngo_types "github.com/oresoftware/chat.webtrc/src/common/mongo/types"
-	vibe_types "github.com/oresoftware/chat.webtrc/src/common/types"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	mngo_types "github.com/oresoftware/chat.webrtc/src/common/mongo/types"
+	vibe_types "github.com/oresoftware/chat.webrtc/src/common/types"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
 )
 
 type InputValidator struct {

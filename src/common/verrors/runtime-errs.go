@@ -3,7 +3,7 @@ package virl_err
 
 import (
 	"fmt"
-	vbl "github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"sync"
 )
 

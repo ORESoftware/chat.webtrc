@@ -4,7 +4,7 @@ package virl_mongo
 import (
 	"context"
 	"fmt"
-	virl_conf "github.com/oresoftware/chat.webtrc/src/config"
+	virl_conf "github.com/oresoftware/chat.webrtc/src/config"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

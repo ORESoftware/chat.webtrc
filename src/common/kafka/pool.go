@@ -4,10 +4,10 @@ package virl_kafka
 import (
 	"fmt"
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	vapm "github.com/oresoftware/chat.webtrc/src/common/apm"
-	virl_cleanup "github.com/oresoftware/chat.webtrc/src/common/cleanup"
-	vhp "github.com/oresoftware/chat.webtrc/src/common/handle-panic"
-	"github.com/oresoftware/chat.webtrc/src/common/vibelog"
+	vapm "github.com/oresoftware/chat.webrtc/src/common/apm"
+	virl_cleanup "github.com/oresoftware/chat.webrtc/src/common/cleanup"
+	vhp "github.com/oresoftware/chat.webrtc/src/common/handle-panic"
+	"github.com/oresoftware/chat.webrtc/src/common/vibelog"
 	"sync"
 	"time"
 )

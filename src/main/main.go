@@ -3,51 +3,46 @@ package main
 import (
 	"bufio"
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
-	"encoding/json" // Keep json for simplified stdin reading
 	"fmt"
-	muxctx "github.com/gorilla/context"
-	"github.com/gorilla/mux"
-	virl_cleanup "github.com/oresoftware/chat.webtrc/src/common/cleanup"
-	virl_mongo "github.com/oresoftware/chat.webtrc/src/common/mongo"
-	au "github.com/oresoftware/chat.webtrc/src/common/v-aurora"
-	virl_const "github.com/oresoftware/chat.webtrc/src/common/v-constants" // May still be needed for other constants
-	vbu "github.com/oresoftware/chat.webtrc/src/common/v-utils"
-	virl_err "github.com/oresoftware/chat.webtrc/src/common/verrors"
-	"github.com/oresoftware/chat.webtrc/src/common/vibelog"
-	virl_conf "github.com/oresoftware/chat.webtrc/src/config"
-	"github.com/oresoftware/chat.webtrc/src/rest/controller"
-	"github.com/oresoftware/chat.webtrc/src/rest/ctx"
-	mw "github.com/oresoftware/chat.webtrc/src/rest/middleware"
-	virl_ws "github.com/oresoftware/chat.webtrc/src/ws"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"os/signal"
 	"path"
-	"reflect"
-	"regexp"
 	"runtime/trace"
 	"strings"
 	"sync"
 	"syscall"
 	"time"
 
+	muxctx "github.com/gorilla/context"
+	"github.com/gorilla/mux"
+	virl_cleanup "github.com/oresoftware/chat.webrtc/src/common/cleanup"
+	virl_mongo "github.com/oresoftware/chat.webrtc/src/common/mongo"
+	au "github.com/oresoftware/chat.webrtc/src/common/v-aurora" // May still be needed for other constants
+	vbu "github.com/oresoftware/chat.webrtc/src/common/v-utils"
+	virl_err "github.com/oresoftware/chat.webrtc/src/common/verrors"
+	vbl "github.com/oresoftware/chat.webrtc/src/common/vibelog"
+	virl_conf "github.com/oresoftware/chat.webrtc/src/config"
+	"github.com/oresoftware/chat.webrtc/src/rest/controller"
+	"github.com/oresoftware/chat.webrtc/src/rest/ctx"
+	mw "github.com/oresoftware/chat.webrtc/src/rest/middleware"
+	virl_ws "github.com/oresoftware/chat.webrtc/src/ws"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
+
 	"errors"
-	vapm "github.com/oresoftware/chat.webtrc/src/common/apm"
-	vhp "github.com/oresoftware/chat.webtrc/src/common/handle-panic"
-	rest_conn "github.com/oresoftware/chat.webtrc/src/rest/conn" // Still needed for rest server conn counter
-	"github.com/oresoftware/chat.webtrc/src/rest/rt-settings"    // Still needed for rt settings
-	ws_conn "github.com/oresoftware/chat.webtrc/src/ws/conn"     // Still needed for wss conn counter
 	"runtime/pprof"
+
+	vapm "github.com/oresoftware/chat.webrtc/src/common/apm"
+	vhp "github.com/oresoftware/chat.webrtc/src/common/handle-panic"
+	rest_conn "github.com/oresoftware/chat.webrtc/src/rest/conn" // Still needed for rest server conn counter
+	"github.com/oresoftware/chat.webrtc/src/rest/rt-settings"    // Still needed for rt settings
+	ws_conn "github.com/oresoftware/chat.webrtc/src/ws/conn"     // Still needed for wss conn counter
 )
 
 /*
