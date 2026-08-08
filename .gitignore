@@ -7,3 +7,6 @@ tmp
 */*.env
 **/**/*.env
 */**/*.env
+temp
+tmp/worktrees
+temp/worktrees
